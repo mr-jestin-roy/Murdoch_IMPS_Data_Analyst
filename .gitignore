@@ -1,0 +1,27 @@
+# R
+.RData
+.Rhistory
+.Ruserdata
+*.Rproj.user/
+*.Rproj.user
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Excel temp / lock files
+~$*
+*.tmp
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Optional: uncomment to ignore large outputs if you prefer not to track
+# *.png
+# *.pdf
+# *.xlsx
