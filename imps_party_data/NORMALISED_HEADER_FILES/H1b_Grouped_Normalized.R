@@ -33,6 +33,7 @@ excel_files <- list(
   list(file = "NORMALISED_HEADER_FILES/ALP_Combined.xlsx", sheet = "ALP (Combined)", party = "ALP"),
   list(file = "NORMALISED_HEADER_FILES/LPA_Combined.xlsx", sheet = "LPA (Combined)", party = "LPA"),
   list(file = "NORMALISED_HEADER_FILES/Nationals_Combined.xlsx", sheet = "Nationals (Combined)", party = "Nationals"),
+  list(file = "NORMALISED_HEADER_FILES/Australian Greens 2025.xlsx", sheet = "AG (national)", party = "Greens"),
   list(file = "NORMALISED_HEADER_FILES/One Nation 2025.xlsx", sheet = "ONP", party = "ONP"),
   list(file = "NORMALISED_HEADER_FILES/Other Minor Parties_2025_A.xlsx", sheet = "AJP", party = "AJP"),
   list(file = "NORMALISED_HEADER_FILES/Other Minor Parties_2025_A.xlsx", sheet = "ACP", party = "ACP"),
@@ -52,7 +53,7 @@ for (file_info in excel_files) {
     mutate(category = toupper(trimws(as.character(category_raw)))) %>%
     select(-category_raw) %>%
     mutate(party = file_info$party)
-  
+
   all_data <- bind_rows(all_data, df)
   cat("✓ Loaded:", file_info$party, "-", nrow(df), "records\n")
 }
@@ -64,7 +65,7 @@ all_data <- all_data %>%
   mutate(
     party_type = case_when(
       party %in% c("ALP", "LPA", "Nationals") ~ "Major Party",
-      party %in% c("ONP", "AJP", "ACP", "KAP", "Shooters") ~ "Minor Party",
+      party %in% c("Greens", "ONP", "AJP", "ACP", "KAP", "Shooters") ~ "Minor Party",
       party %in% c("Wilkie", "Haines McGowan") ~ "Independent",
       TRUE ~ "Unknown"
     )
@@ -128,7 +129,7 @@ donor_count_summary <- donor_count_by_party_type %>%
     total_all_donors = sum(total_donors),
     pct_of_all_donors = (total_donors / total_all_donors) * 100
   ) %>%
-  select(party_type, total_donors, pct_of_all_donors, n_parties, 
+  select(party_type, total_donors, pct_of_all_donors, n_parties,
          avg_donors_per_party, total_amount)
 
 cat("Aggregated by Party Type (INDIVIDUAL DONOR COUNT):\n")
@@ -157,7 +158,7 @@ h1b_viz_data_grouped <- donor_count_by_party_type %>%
   # Normalize: scale to 0-100 within each party type
   mutate(
     normalized_count = (donor_count / max(donor_count)) * 100,
-    party_type = factor(party_type, 
+    party_type = factor(party_type,
                         levels = c("Major Party", "Minor Party", "Independent"))
   ) %>%
   ungroup() %>%
@@ -187,13 +188,13 @@ party_type_palette <- c(
 )
 
 # Create the grouped bar chart
-p_h1b_grouped <- ggplot(h1b_viz_data_grouped, 
+p_h1b_grouped <- ggplot(h1b_viz_data_grouped,
                         aes(x = party, y = normalized_count, fill = party_type)) +
-  
+
   # Grouped (dodged) bars
   geom_bar(stat = "identity", position = "dodge", width = 0.7,
            color = "white", linewidth = 0.4, alpha = 0.95) +
-  
+
   # ADD TEXT LABELS showing ACTUAL donor counts on top of bars
   geom_text(aes(label = donor_count),
             position = position_dodge(width = 0.7),
@@ -201,7 +202,7 @@ p_h1b_grouped <- ggplot(h1b_viz_data_grouped,
             size = 3.2,
             fontface = "bold",
             color = "#333333")
-  
+
   # Scale formatting
   scale_y_continuous(
     labels = function(x) paste0(x, "%"),
@@ -209,7 +210,7 @@ p_h1b_grouped <- ggplot(h1b_viz_data_grouped,
     breaks = seq(0, 100, by = 20),
     limits = c(0, 110)
   ) +
-  
+
   # Color palette
   scale_fill_manual(
     values = party_type_palette,
@@ -223,7 +224,7 @@ p_h1b_grouped <- ggplot(h1b_viz_data_grouped,
       reverse = FALSE
     )
   ) +
-  
+
   # Labels
   labs(
     title = "H1b: Individual Donor Count by Political Actor (Normalized)",
@@ -232,7 +233,7 @@ p_h1b_grouped <- ggplot(h1b_viz_data_grouped,
     y = "Normalized Count (0-100 scale within party type)",
     caption = "Source: AEC Political Donations Data | Metric: COUNT of individual donor records (1, 1A, 1B, 1C)\nNormalization: Within each party type, the party with most donors = 100%, others scaled proportionally\nH1b Test: Do Minor Parties attract higher share of individual donors than Independents?"
   ) +
-  
+
   # Theme
   theme_minimal(base_size = 11, base_family = "sans") +
   theme(
@@ -257,16 +258,16 @@ p_h1b_grouped <- ggplot(h1b_viz_data_grouped,
 print(p_h1b_grouped)
 
 # Save chart
-ggsave("H1b_Individual_Donors_Grouped_Normalized.png", 
-       p_h1b_grouped, 
-       width = 14, 
-       height = 8, 
+ggsave("H1b_Individual_Donors_Grouped_Normalized.png",
+       p_h1b_grouped,
+       width = 14,
+       height = 8,
        dpi = 300,
        bg = "white")
 
-ggsave("H1b_Individual_Donors_Grouped_Normalized.pdf", 
-       p_h1b_grouped, 
-       width = 14, 
+ggsave("H1b_Individual_Donors_Grouped_Normalized.pdf",
+       p_h1b_grouped,
+       width = 14,
        height = 8,
        bg = "white")
 
@@ -316,7 +317,7 @@ write_xlsx(
         pct_of_all_donors = round(pct_of_all_donors, 1),
         total_amount = round(total_amount, 0)
       ) %>%
-      select(party_type, total_donors, pct_of_all_donors, n_parties, 
+      select(party_type, total_donors, pct_of_all_donors, n_parties,
              avg_donors_per_party, total_amount) %>%
       rename(
         "Party Type" = party_type,
@@ -326,7 +327,7 @@ write_xlsx(
         "Avg Donors/Party" = avg_donors_per_party,
         "Total Amount ($)" = total_amount
       ),
-    
+
     "Detail_by_Actor" = actor_detail %>%
       mutate(
         total_amount = round(total_amount, 0),
@@ -340,7 +341,7 @@ write_xlsx(
         "Total Amount ($)" = total_amount,
         "Avg Donation ($)" = avg_donation
       ),
-    
+
     "Grouped_Chart_Data" = h1b_viz_data_grouped %>%
       select(party_type, party, donor_count, normalized_count) %>%
       mutate(normalized_count = round(normalized_count, 1)) %>%
@@ -409,7 +410,7 @@ print(
       normalized_count = round(normalized_count, 1)
     ) %>%
     select(party_type, party, donor_count, normalized_count) %>%
-    rename("Type" = party_type, "Actor" = party, 
+    rename("Type" = party_type, "Actor" = party,
            "Actual Count" = donor_count, "Normalized (0-100)" = normalized_count)
 )
 cat("\n")

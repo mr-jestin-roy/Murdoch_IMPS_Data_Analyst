@@ -15,7 +15,7 @@ library(readxl)
 library(writexl)
 library(dplyr)
 library(tidyr)
-library(ggplot2)``
+library(ggplot2)
 
 # ============================================================================
 # STEP 1: READ THE COMPLETE POLITICAL DONATIONS DATA # nolint
@@ -216,7 +216,7 @@ chart_data <- party_composition_complete %>%
   mutate(
     party_order = case_when(
       party %in% c("ALP", "LPA", "Nationals") ~ 1,
-      party %in% c("ONP", "AJP", "ACP", "KAP", "Shooters") ~ 2,
+      party %in% c("Greens", "ONP", "AJP", "ACP", "KAP", "Shooters") ~ 2,
       party %in% c("Wilkie", "Haines McGowan") ~ 3,
       TRUE ~ 4
     )
@@ -544,11 +544,11 @@ ggsave("Hypothesis_H1a_Individual_Donor_Share.png",
        dpi = 300,
        bg = "white")
 
-ggsave("Hypothesis_H1a_Individual_Donor_Share.pdf",
-       p_h1a,
-       width = 12,
-       height = 8,
-       bg = "white")
+# ggsave("Hypothesis_H1a_Individual_Donor_Share.pdf",
+#        p_h1a,
+#        width = 12,
+#        height = 8,
+#        bg = "white")
 
 cat("✅ Hypothesis H1a visualization saved!\n")
 cat("   📊 Hypothesis_H1a_Individual_Donor_Share.png\n")
