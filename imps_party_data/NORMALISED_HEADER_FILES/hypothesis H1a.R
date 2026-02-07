@@ -374,11 +374,16 @@ ggsave("NORMALISED_HEADER_FILES/Political_Donations_Vertical_100pct_Stacked.png"
        height = 8,
        dpi = 300,
        bg = "white")
-
-
+# PDF (for journals and publications)
+ggsave("NORMALISED_HEADER_FILES/Political_Donations_Vertical_100pct_Stacked.pdf",
+       p,
+       width = 12,
+       height = 8,
+       bg = "white")
 
 cat("✅ EXPORT COMPLETE:\n")
 cat("   📊 .PNG  (300 DPI) - For presentations & web\n")
+cat("   📄 .PDF - For journals and publications\n")
 
 
 
@@ -543,12 +548,11 @@ ggsave("Hypothesis_H1a_Individual_Donor_Share.png",
        height = 8,
        dpi = 300,
        bg = "white")
-
-# ggsave("Hypothesis_H1a_Individual_Donor_Share.pdf",
-#        p_h1a,
-#        width = 12,
-#        height = 8,
-#        bg = "white")
+ggsave("Hypothesis_H1a_Individual_Donor_Share.pdf",
+       p_h1a,
+       width = 12,
+       height = 8,
+       bg = "white")
 
 cat("✅ Hypothesis H1a visualization saved!\n")
 cat("   📊 Hypothesis_H1a_Individual_Donor_Share.png\n")
