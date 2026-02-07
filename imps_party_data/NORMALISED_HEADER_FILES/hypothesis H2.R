@@ -171,5 +171,6 @@ p_final <- ggplot(plot_data_facet, aes(x = donor_code, y = total_amount, fill = 
 print(p_final)
 # 4. Save High-Res Output
 ggsave("H2_Funding_Diversification_Analysis.png", plot = p_final, width = 10, height = 12, dpi = 300)
+ggsave("H2_Funding_Diversification_Analysis.pdf", plot = p_final, width = 10, height = 12, bg = "white")
 
 print(p_final)

@@ -41,12 +41,12 @@ full_data <- data.frame()
 for (item in file_list) {
   if(file.exists(item$file)) {
     df <- read_excel(item$file, sheet = item$sheet)
-    
+
     # Clean Data
     clean_df <- df %>%
       select(YEAR, AMOUNT) %>%
       mutate(
-        # Remove $ and , 
+        # Remove $ and ,
         AMOUNT = as.numeric(gsub("[$,]", "", as.character(AMOUNT))),
         # Extract first 4 digits for Year (handles "2025ER", "2022-2023")
         YEAR_CLEAN = as.numeric(str_extract(as.character(YEAR), "\\d{4}")),
@@ -56,7 +56,7 @@ for (item in file_list) {
       group_by(YEAR_CLEAN, Actor) %>%
       summarise(Total_Receipts = sum(AMOUNT, na.rm = TRUE), .groups = "drop") %>%
       rename(Year = YEAR_CLEAN)
-    
+
     full_data <- bind_rows(full_data, clean_df)
     cat("✓ Loaded:", item$actor, "\n")
   } else {
@@ -113,14 +113,14 @@ final_data <- h3_data %>%
     H3a_Rolling_Volatility = rollapply(Pct_Change, width = 3, FUN = sd, fill = NA, align = "right") * 100
   ) %>%
   ungroup() %>%
-  
+
   # Select and Rename for the Final Table
   select(
-    Actor, 
-    Year, 
-    Is_Pivotal, 
-    Total_Receipts, 
-    Pct_Change, 
+    Actor,
+    Year,
+    Is_Pivotal,
+    Total_Receipts,
+    Pct_Change,
     H3a_Rolling_Volatility
   ) %>%
   rename(
@@ -156,32 +156,32 @@ all_years <- seq(min_year, max_year, 1)
 p1 <- ggplot(h3_plot_data, aes(x = Year, y = Total_Receipts, color = Actor, group = Actor)) +
   geom_line(linewidth = 0.8, alpha = 0.7) +
   geom_point(size = 1.5) +
-  
+
   # Highlight Pivotal Years (Large Dots)
-  geom_point(data = subset(h3_plot_data, Is_Pivotal == "Yes"), 
+  geom_point(data = subset(h3_plot_data, Is_Pivotal == "Yes"),
              aes(fill = Actor), shape = 21, size = 3.5, color = "black", stroke = 1) +
-  
+
   # Annotation Text for Pivotal Years
   geom_text_repel(data = subset(h3_plot_data, Is_Pivotal == "Yes"),
                   aes(label = paste(Year, Type, sep="\n")),
                   size = 2.5, fontface = "bold", color = "black",
                   box.padding = 0.5, min.segment.length = 0) +
-  
+
   # SCALES
   # Log10 Scale for Y-Axis (Critical for comparing Major vs Minor parties)
-  scale_y_log10(labels = dollar_format(), breaks = trans_breaks("log10", function(x) 10^x)) + 
+  scale_y_log10(labels = dollar_format(), breaks = trans_breaks("log10", function(x) 10^x)) +
   annotation_logticks(sides = "l") + # Adds log tick marks on the left
-  
+
   # Granular X-Axis (Every single year)
   scale_x_continuous(breaks = all_years) +
-  
+
   labs(
     title = "H3: Leverage and Stability (All Actors)",
     subtitle = "Logarithmic Scale used to visualize Major Parties and Independents simultaneously",
     y = "Total Receipts (Log Scale $)",
     x = "Year"
   ) +
-  
+
   theme_minimal() +
   theme(
     legend.position = "bottom",
@@ -191,7 +191,8 @@ p1 <- ggplot(h3_plot_data, aes(x = Year, y = Total_Receipts, color = Actor, grou
   )
 
 print(p1)
-ggsave("H3_Leverage_and_Stability.png", plot = p1, width = 12, height = 8, dpi = 300)
+# ggsave("H3_Leverage_and_Stability.png", plot = p1, width = 12, height = 8, dpi = 300)
+ggsave("H3_Leverage_and_Stability.pdf", plot = p1, width = 12, height = 8, bg = "white")
 
 # ==============================================================================
 # . H3a VISUALIZATION (TENURE VS VOLATILITY)
@@ -219,7 +220,7 @@ h3a_stats <- h3_data %>%
   summarise(
     Mean_Receipts = mean(Total_Receipts, na.rm = TRUE),
     # Calculate Standard Deviation of the Year-on-Year % Change
-    Volatility_StdDev_Pct = sd(Pct_Change, na.rm = TRUE) * 100, 
+    Volatility_StdDev_Pct = sd(Pct_Change, na.rm = TRUE) * 100,
     .groups = "drop"
   ) %>%
   left_join(tenure_map, by = "Actor")
@@ -227,7 +228,7 @@ h3a_stats <- h3_data %>%
 p2 <- ggplot(h3a_stats, aes(x = Tenure_Years, y = Volatility_StdDev_Pct, color = Actor)) +
   geom_point(size = 5, alpha = 0.8) +
   geom_text_repel(aes(label = Actor), size = 4, box.padding = 0.5) +
-  
+
   scale_y_continuous(labels = function(x) paste0(x, "%")) +
   labs(
     title = "H3a: Legislative Tenure vs. Volatility",
@@ -239,4 +240,5 @@ p2 <- ggplot(h3a_stats, aes(x = Tenure_Years, y = Volatility_StdDev_Pct, color =
   theme(legend.position = "none")
 
 print(p2)
-ggsave("H3a_Legislative_Tenure.png", plot = p2, width = 10, height = 6, dpi = 300)
+# ggsave("H3a_Legislative_Tenure.png", plot = p2, width = 10, height = 6, dpi = 300)
+ggsave("H3a_Legislative_Tenure.pdf", plot = p2, width = 10, height = 6, bg = "white")

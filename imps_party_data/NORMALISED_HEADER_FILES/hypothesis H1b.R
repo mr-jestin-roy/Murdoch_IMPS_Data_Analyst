@@ -235,6 +235,7 @@ print(p_h1b_elaborated)
 
 # Save for your paper
 ggsave("H1b_Faceted_Bar_Chart.png", p_h1b_elaborated, width = 11, height = 6, dpi = 300)
+ggsave("H1b_Faceted_Bar_Chart.pdf", p_h1b_elaborated, width = 11, height = 6, bg = "white")
 
 # ============================================================================
 # STEP 6: DETAILED BREAKDOWN BY SUBCATEGORY AND PARTY TYPE
