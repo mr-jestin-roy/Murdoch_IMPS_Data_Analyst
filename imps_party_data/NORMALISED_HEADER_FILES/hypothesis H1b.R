@@ -178,7 +178,7 @@ print(h1b_grouped_data)
 cat("\n")
 
 # ============================================================================
-# ENHANCED STEP 5: RESEARCH-GRADE Intra-group Proportional Faceting CHART
+#  STEP 5: RESEARCH-GRADE Intra-group Proportional Faceting CHART
 # ============================================================================
 
 # Calculate percentages within the plot data for labeling

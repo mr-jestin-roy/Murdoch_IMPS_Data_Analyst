@@ -368,22 +368,16 @@ cat("✅ Vertical chart created successfully!\n\n")
 # ============================================================================
 
 # HIGH-RESOLUTION PNG (for presentations, web)
-ggsave("NORMALISED_HEADER_FILES/Political_Donations_Vertical_100pct_Stacked.png",
+ggsave("Political_Donations_Vertical_100pct_Stacked.png",
        p,
        width = 12,
        height = 8,
-       dpi = 300,
-       bg = "white")
-# PDF (for journals and publications)
-ggsave("NORMALISED_HEADER_FILES/Political_Donations_Vertical_100pct_Stacked.pdf",
-       p,
-       width = 12,
-       height = 8,
+       dpi = 600,
        bg = "white")
 
+
 cat("✅ EXPORT COMPLETE:\n")
-cat("   📊 .PNG  (300 DPI) - For presentations & web\n")
-cat("   📄 .PDF - For journals and publications\n")
+cat("   📊 .PNG  (600 DPI) - For presentations & web\n")
 
 
 
