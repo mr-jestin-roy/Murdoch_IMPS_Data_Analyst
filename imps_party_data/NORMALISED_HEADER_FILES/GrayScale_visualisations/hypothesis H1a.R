@@ -74,24 +74,24 @@ h1a_data <- all_data %>%
 
 # --- STEP 3: FIXED MAPPING ---
 # Ensure "Individual donations" is at the base of the factor levels
-cat_levels <- c("Individual donations", "For profit entities", "Associations", 
-                "Civil society organisations", "Party/candidate", "Subventions", 
+cat_levels <- c("Individual donations", "For profit entities", "Associations",
+                "Civil society organisations", "Party/candidate", "Subventions",
                 "Political fundraising vehicles", "Other")
 
 h1a_data$donor_category <- factor(h1a_data$donor_category, levels = rev(cat_levels))
-h1a_data$party_type <- factor(h1a_data$party_type, 
+h1a_data$party_type <- factor(h1a_data$party_type,
                               levels = c("Major Parties", "Minor Parties", "Independents\n(Wilkie, McGowan/Haines)"))
 
 # [CORRECTION]: Changed 'point' to 'circle' for ggpattern compatibility
 pattern_map <- c(
-  "Individual donations"           = "none",       
-  "For profit entities"            = "stripe",     
-  "Associations"                   = "crosshatch", 
-  "Civil society organisations"    = "circle",     
-  "Party/candidate"                = "stripe",     
-  "Subventions"                    = "none",       
-  "Political fundraising vehicles"  = "crosshatch", 
-  "Other"                          = "none"        
+  "Individual donations"           = "none",
+  "For profit entities"            = "stripe",
+  "Associations"                   = "crosshatch",
+  "Civil society organisations"    = "circle",
+  "Party/candidate"                = "stripe",
+  "Subventions"                    = "none",
+  "Political fundraising vehicles"  = "crosshatch",
+  "Other"                          = "none"
 )
 
 # --- STEP 4: VISUALIZATION ---
@@ -100,10 +100,10 @@ p_h1a_pattern <- ggplot(h1a_data, aes(x = party_type, y = percentage, fill = don
     aes(pattern = donor_category),
     position = "stack",
     width = 0.6,
-    color = "black",           
-    pattern_fill = "black",    
-    pattern_color = "black", 
-    pattern_density = 0.1,     
+    color = "black",
+    pattern_fill = "black",
+    pattern_color = "black",
+    pattern_density = 0.1,
     pattern_spacing = 0.02,
     linewidth = 0.3 # Use 'linewidth' instead of 'size'
   ) +
@@ -118,7 +118,68 @@ p_h1a_pattern <- ggplot(h1a_data, aes(x = party_type, y = percentage, fill = don
     axis.line.y = element_line(color = "black"),
     panel.grid = element_blank()
   )
+# --- STEP 4: VISUALIZATION WITH LABELS ---
+p_h1a_pattern <- ggplot(h1a_data, aes(x = party_type, y = percentage, fill = donor_category)) +
+  
+  # 1. Main Patterned Bar Layer
+  geom_col_pattern(
+    aes(pattern = donor_category),
+    position = "stack",
+    width = 0.6,
+    color = "black",           
+    pattern_fill = "black",    
+    pattern_color = "black", 
+    pattern_density = 0.1,     
+    pattern_spacing = 0.02,
+    linewidth = 0.3
+  ) +
+  
+  # 2. NEW: Percentage Labels Layer
+  # Uses 'color' aes to switch between white/black text based on background
+  geom_text(
+    aes(
+      label = ifelse(percentage > 0.5, paste0(round(percentage, 1), "%"), ""),
+      color = donor_category
+    ),
+    position = position_stack(vjust = 0.5),
+    size = 3,          # Smaller font to fit in narrow bars
+    fontface = "bold",
+    family = "sans"
+  ) +
+  
+  # 3. Text Color Scale (High Contrast)
+  # Maps specific categories to White or Black text for readability
+  scale_color_manual(values = c(
+    "Individual donations" = "black",          # Light background -> Black text
+    "For profit entities" = "white",           # Dark/Striped -> White text
+    "Associations" = "white",
+    "Civil society organisations" = "white",
+    "Party/candidate" = "white",
+    "Subventions" = "black",                   # Light background -> Black text
+    "Political fundraising vehicles" = "white",
+    "Other" = "black"
+  ), guide = "none") + # Hide the text color legend
+  
+  # 4. Fill and Pattern Scales
+  scale_fill_grey(start = 0.95, end = 0.1, name = "Donor Category") +
+  scale_pattern_manual(values = pattern_map, name = "Donor Category") +
+  
+  # 5. Axes and Theme
+  scale_y_continuous(labels = scales::percent_format(scale = 1), expand = c(0,0)) +
+  labs(x = NULL, y = "Share of Total Funding") +
+  theme_minimal() +
+  theme(
+    legend.position = "right",
+    axis.text.x = element_text(size = 11, face = "bold", color = "black"),
+    axis.line.y = element_line(color = "black"),
+    panel.grid = element_blank()
+  ) +
+  
+  # 6. Merge Legends
+  guides(fill = guide_legend(ncol = 1), pattern = guide_legend(ncol = 1))
 
+  # Print the plot to check labels
+  print(p_h1a_pattern)
 # --- STEP 5: EXPORT ---
 ggsave("AJPS_H1a_Individual_Donor_Share_Patterned_Grayscale.png", 
        p_h1a_pattern, width = 10, height = 8, dpi = 600)

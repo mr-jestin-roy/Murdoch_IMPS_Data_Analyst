@@ -368,12 +368,12 @@ cat("✅ Vertical chart created successfully!\n\n")
 # ============================================================================
 
 # HIGH-RESOLUTION PNG (for presentations, web)
-ggsave("Political_Donations_Vertical_100pct_Stacked.png",
-       p,
-       width = 12,
-       height = 8,
-       dpi = 600,
-       bg = "white")
+# ggsave("Political_Donations_Vertical_100pct_Stacked.png",
+       # p,
+       # width = 12,
+       # height = 8,
+       # dpi = 600,
+       # bg = "white")
 
 
 cat("✅ EXPORT COMPLETE:\n")
@@ -448,6 +448,90 @@ if (minor_ind > indep_ind) {
 }
 cat("\n")
 
+# # ============================================================================
+# # CREATE HYPOTHESIS TEST VISUALIZATION (3 PARTY TYPES)
+# # ============================================================================
+# 
+# p_h1a <- ggplot(hypothesis_data, aes(x = party_group, y = percentage, fill = donor_category)) +
+#   geom_bar(stat = "identity", position = "stack", width = 0.60,
+#            color = "white", size = 0.4, alpha = 0.95) +
+# 
+#   # Scale formatting
+#   scale_y_continuous(
+#     labels = scales::percent_format(scale = 1, accuracy = 1),
+#     expand = expansion(mult = c(0, 0.02)),
+#     breaks = seq(0, 100, by = 20),
+#     limits = c(0, 105)
+#   ) +
+# 
+#   # Professional color palette (Paul Tol Colorblind-Safe)
+#   scale_fill_manual(
+#     values = research_palette,
+#     name = "Donor Category",
+#     guide = guide_legend(
+#       ncol = 2,
+#       title.position = "top",
+#       label.position = "bottom",
+#       keywidth = 0.8,
+#       keyheight = 0.5
+#     )
+#   ) +
+# 
+#   # Labels and titles
+#   labs(
+#     title = "Hypothesis H1a: Individual Donor Share Across Party Types",
+#     subtitle = "Are minor parties more reliant on individual donors than independents? | Mean composition by party classification",
+#     x = "Party Classification",
+#     y = "Share of Total Donations (%)",
+#     caption = "Source: Australian Electoral Commission (AEC) | Method: Mean composition within each party type group"
+#   ) +
+# 
+#   # Academic theme
+#   theme_minimal(base_size = 11, base_family = "sans") +
+#   theme(
+#     plot.title = element_text(
+#       size = 15,
+#       face = "bold",
+#       hjust = 0.5,
+#       margin = margin(b = 4)
+#     ),
+#     plot.subtitle = element_text(
+#       size = 11,
+#       hjust = 0.5,
+#       color = "#333333",
+#       margin = margin(b = 14)
+#     ),
+#     axis.title.x = element_text(
+#       size = 11,
+#       face = "bold",
+#       margin = margin(t = 12)
+#     ),
+#     axis.title.y = element_text(
+#       size = 11,
+#       face = "bold",
+#       margin = margin(r = 12)
+#     ),
+#     axis.text.x = element_text(
+#       size = 10,
+#       color = "#333333",
+#       vjust = 0.5
+#     ),
+#     axis.text.y = element_text(
+#       size = 10,
+#       color = "#333333"
+#     ),
+#     axis.line = element_line(color = "#333333", size = 0.3),
+#     panel.grid.major.y = element_line(color = "#EBEBEB", size = 0.3),
+#     panel.grid.minor = element_blank(),
+#     panel.grid.major.x = element_blank(),
+#     legend.position = "bottom",
+#     legend.title = element_text(size = 10, face = "bold", hjust = 0.5),
+#     legend.text = element_text(size = 9, color = "#333333"),
+#     legend.box = "vertical",
+#     legend.margin = margin(t = 15),
+#     plot.caption = element_text(size = 8, color = "#666666", hjust = 0, margin = margin(t = 10)),
+#     plot.margin = margin(t = 15, r = 15, b = 15, l = 15)
+#   )
 # ============================================================================
 # CREATE HYPOTHESIS TEST VISUALIZATION (3 PARTY TYPES)
 # ============================================================================
@@ -455,7 +539,17 @@ cat("\n")
 p_h1a <- ggplot(hypothesis_data, aes(x = party_group, y = percentage, fill = donor_category)) +
   geom_bar(stat = "identity", position = "stack", width = 0.60,
            color = "white", size = 0.4, alpha = 0.95) +
-
+  
+  # --- NEW: ADD PERCENTAGE LABELS FOR ALL SECTIONS ---
+  # We use > 0 so exact zeroes are hidden, but even 0.1% will be shown.
+  # Size is reduced to 2.8 to help fit text into the smallest slivers.
+  geom_text(aes(label = ifelse(percentage > 0, paste0(round(percentage, 1), "%"), "")),
+            position = position_stack(vjust = 0.5),
+            size = 2, 
+            fontface = "bold",
+            color = "black",
+            family = "sans") +
+  
   # Scale formatting
   scale_y_continuous(
     labels = scales::percent_format(scale = 1, accuracy = 1),
@@ -463,7 +557,7 @@ p_h1a <- ggplot(hypothesis_data, aes(x = party_group, y = percentage, fill = don
     breaks = seq(0, 100, by = 20),
     limits = c(0, 105)
   ) +
-
+  
   # Professional color palette (Paul Tol Colorblind-Safe)
   scale_fill_manual(
     values = research_palette,
@@ -476,7 +570,7 @@ p_h1a <- ggplot(hypothesis_data, aes(x = party_group, y = percentage, fill = don
       keyheight = 0.5
     )
   ) +
-
+  
   # Labels and titles
   labs(
     title = "Hypothesis H1a: Individual Donor Share Across Party Types",
@@ -485,41 +579,16 @@ p_h1a <- ggplot(hypothesis_data, aes(x = party_group, y = percentage, fill = don
     y = "Share of Total Donations (%)",
     caption = "Source: Australian Electoral Commission (AEC) | Method: Mean composition within each party type group"
   ) +
-
+  
   # Academic theme
   theme_minimal(base_size = 11, base_family = "sans") +
   theme(
-    plot.title = element_text(
-      size = 15,
-      face = "bold",
-      hjust = 0.5,
-      margin = margin(b = 4)
-    ),
-    plot.subtitle = element_text(
-      size = 11,
-      hjust = 0.5,
-      color = "#333333",
-      margin = margin(b = 14)
-    ),
-    axis.title.x = element_text(
-      size = 11,
-      face = "bold",
-      margin = margin(t = 12)
-    ),
-    axis.title.y = element_text(
-      size = 11,
-      face = "bold",
-      margin = margin(r = 12)
-    ),
-    axis.text.x = element_text(
-      size = 10,
-      color = "#333333",
-      vjust = 0.5
-    ),
-    axis.text.y = element_text(
-      size = 10,
-      color = "#333333"
-    ),
+    plot.title = element_text(size = 15, face = "bold", hjust = 0.5, margin = margin(b = 4)),
+    plot.subtitle = element_text(size = 11, hjust = 0.5, color = "#333333", margin = margin(b = 14)),
+    axis.title.x = element_text(size = 11, face = "bold", margin = margin(t = 12)),
+    axis.title.y = element_text(size = 11, face = "bold", margin = margin(r = 12)),
+    axis.text.x = element_text(size = 10, color = "#333333", vjust = 0.5),
+    axis.text.y = element_text(size = 10, color = "#333333"),
     axis.line = element_line(color = "#333333", size = 0.3),
     panel.grid.major.y = element_line(color = "#EBEBEB", size = 0.3),
     panel.grid.minor = element_blank(),
@@ -532,7 +601,6 @@ p_h1a <- ggplot(hypothesis_data, aes(x = party_group, y = percentage, fill = don
     plot.caption = element_text(size = 8, color = "#666666", hjust = 0, margin = margin(t = 10)),
     plot.margin = margin(t = 15, r = 15, b = 15, l = 15)
   )
-
 print(p_h1a)
 
 # Save hypothesis test chart
@@ -542,11 +610,11 @@ ggsave("Hypothesis_H1a_Individual_Donor_Share.png",
        height = 8,
        dpi = 300,
        bg = "white")
-ggsave("Hypothesis_H1a_Individual_Donor_Share.pdf",
-       p_h1a,
-       width = 12,
-       height = 8,
-       bg = "white")
+# ggsave("Hypothesis_H1a_Individual_Donor_Share.pdf",
+#        p_h1a,
+#        width = 12,
+#        height = 8,
+#        bg = "white")
 
 cat("✅ Hypothesis H1a visualization saved!\n")
 cat("   📊 Hypothesis_H1a_Individual_Donor_Share.png\n")
